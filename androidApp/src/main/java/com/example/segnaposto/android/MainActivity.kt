@@ -45,7 +45,8 @@ class MainActivity : ComponentActivity() {
                         route = "park_screen"
                     ) {
                         ParkScreen(
-                            navController = navController
+                            navController = navController,
+                            applicationContext = applicationContext
                         )
                     }
                 }

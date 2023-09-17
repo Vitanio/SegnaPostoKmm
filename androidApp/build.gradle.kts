@@ -48,6 +48,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.1")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.2")
     implementation("androidx.navigation:navigation-compose:2.7.2")
-
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("io.insert-koin:koin-android:3.5.0")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
 }

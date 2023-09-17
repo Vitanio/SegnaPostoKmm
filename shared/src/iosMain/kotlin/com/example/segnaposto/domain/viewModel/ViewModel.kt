@@ -15,11 +15,11 @@ actual abstract class ViewModel {
         if (isCleared) close()
     }
 
-    protected actual open fun onCleared() {}
+    //protected actual open fun onCleared() {}
 
     fun clear() {
         isCleared = true
         viewModelScope.close()
-        onCleared()
+       // onCleared()
     }
 }

@@ -6,5 +6,5 @@ import androidx.lifecycle.viewModelScope as superViewModelScope
 
 actual abstract class ViewModel : AndroidViewModel() {
     actual val viewModelScope: CoroutineScope = superViewModelScope
-    actual override fun onCleared() {}
+    //actual override fun onCleared() {}
 }

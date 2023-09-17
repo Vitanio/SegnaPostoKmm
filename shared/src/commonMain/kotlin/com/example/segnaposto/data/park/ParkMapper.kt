@@ -8,7 +8,6 @@ fun ParkEntity.toPark(): Park {
         id = id,
         title = title,
         description = description,
-        number = number,
         latitude = latitude,
         longitude = longitude,
         date = " "

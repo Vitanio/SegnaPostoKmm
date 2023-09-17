@@ -46,6 +46,7 @@ struct ParkScreen: View {
 }
 
 extension ParkViewModel {
+    
     func observableState() -> ObservableParkState {
         return (state.value as! ParkState).wrapAsObservable()
     }
