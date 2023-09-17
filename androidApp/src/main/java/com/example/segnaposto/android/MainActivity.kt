@@ -16,7 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.segnaposto.Greeting
+import com.example.segnaposto.android.ui.ParkScreen
 import com.example.segnaposto.data.local.DatabaseDriverFactory
 import com.example.segnaposto.data.park.SqlDelightParkDataSource
 import com.example.segnaposto.database.ParkDatabase
@@ -32,39 +36,17 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyApplicationTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "park_screen"
                 ) {
-
-                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-
-                        GreetingView(Greeting().greet())
-
-                        TextButton(
-                            onClick = {
-                                GlobalScope.launch {
-                                    database.insertPark(
-                                        Park(
-                                            title = "Test",
-                                            description = "Test description",
-                                            number = "00",
-                                            latitude = 12.2,
-                                            longitude = 16.6,
-                                            date = "Oggi"
-
-                                        )
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                .background(color = Color.Red)
-                                .height(30.dp)
-                                .width(60.dp),
-
-                        ) {
-
-                        }
+                    composable(
+                        route = "park_screen"
+                    ) {
+                        ParkScreen(
+                            navController = navController
+                        )
                     }
                 }
             }

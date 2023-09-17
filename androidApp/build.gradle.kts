@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.segnaposto.android"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.example.segnaposto.android"
         minSdk = 24
@@ -46,4 +46,8 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.4.3")
     implementation("androidx.compose.material:material:1.4.3")
     implementation("androidx.activity:activity-compose:1.7.1")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.7.2")
+    implementation("androidx.navigation:navigation-compose:2.7.2")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 }

@@ -1,5 +1,6 @@
 package com.example.segnaposto
 
+import com.example.segnaposto.di.DatabaseModule
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {

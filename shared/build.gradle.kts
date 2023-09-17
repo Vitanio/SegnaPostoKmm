@@ -29,6 +29,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 //put your multiplatform dependencies here
+                implementation(
+                    "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+                )
             }
         }
         val commonTest by getting {
@@ -39,6 +42,9 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("app.cash.sqldelight:android-driver:2.0.0-alpha05")
+                implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+
             }
         }
 
@@ -74,7 +80,7 @@ sqldelight {
 
 android {
     namespace = "com.example.segnaposto"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         minSdk = 24
     }
