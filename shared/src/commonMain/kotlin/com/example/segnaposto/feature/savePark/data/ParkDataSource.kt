@@ -1,4 +1,6 @@
-package com.example.segnaposto.domain
+package com.example.segnaposto.feature.savePark.data
+
+import com.example.segnaposto.feature.savePark.model.Park
 
 interface ParkDataSource {
     suspend fun insertPark(park: Park)

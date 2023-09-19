@@ -1,6 +1,4 @@
-package com.example.segnaposto.domain.viewModel
-
-import com.example.segnaposto.domain.Park
+package com.example.segnaposto.feature.savePark.model
 
 data class ParkState(
     val test: String = "",

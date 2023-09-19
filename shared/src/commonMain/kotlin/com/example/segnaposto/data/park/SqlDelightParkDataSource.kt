@@ -1,8 +1,8 @@
 package com.example.segnaposto.data.park
 
 import com.example.segnaposto.database.ParkDatabase
-import com.example.segnaposto.domain.Park
-import com.example.segnaposto.domain.ParkDataSource
+import com.example.segnaposto.feature.savePark.model.Park
+import com.example.segnaposto.feature.savePark.data.ParkDataSource
 
 class SqlDelightParkDataSource(db: ParkDatabase): ParkDataSource {
 

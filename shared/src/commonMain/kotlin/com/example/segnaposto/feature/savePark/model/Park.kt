@@ -1,4 +1,4 @@
-package com.example.segnaposto.domain
+package com.example.segnaposto.feature.savePark.model
 data class Park(
     val id: Long? = null,
     val title: String,

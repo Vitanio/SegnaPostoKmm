@@ -1,4 +1,4 @@
-package com.example.segnaposto.domain.viewModel
+package com.example.segnaposto.util
 
 class Event<out T>(
     private val value: T

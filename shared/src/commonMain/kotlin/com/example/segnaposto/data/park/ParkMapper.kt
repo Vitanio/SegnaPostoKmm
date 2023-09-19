@@ -1,6 +1,6 @@
 package com.example.segnaposto.data.park
 
-import com.example.segnaposto.domain.Park
+import com.example.segnaposto.feature.savePark.model.Park
 import database.ParkEntity
 
 fun ParkEntity.toPark(): Park {

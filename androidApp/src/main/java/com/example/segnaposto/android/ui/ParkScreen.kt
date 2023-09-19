@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import com.example.segnaposto.domain.viewModel.ParkViewModel
+import com.example.segnaposto.feature.savePark.ParkViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.segnaposto.data.local.DatabaseDriverFactory
-import com.example.segnaposto.domain.viewModel.ParkRepository
+import com.example.segnaposto.feature.savePark.ParkRepository
 
 @Composable
 fun ParkScreen(

@@ -1,17 +1,15 @@
-package com.example.segnaposto.domain.viewModel
+package com.example.segnaposto.feature.savePark
 
-import com.example.segnaposto.data.local.DatabaseDriverFactory
-import com.example.segnaposto.data.park.SqlDelightParkDataSource
-import com.example.segnaposto.database.ParkDatabase
-import com.example.segnaposto.domain.Park
-import com.example.segnaposto.domain.ParkDataSource
+import com.example.segnaposto.feature.savePark.model.Park
+import com.example.segnaposto.feature.base.BaseViewModel
+import com.example.segnaposto.feature.savePark.model.ParkState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class ParkViewModel(val repository: ParkRepository): ViewModel() {
+class ParkViewModel(val repository: ParkRepository): BaseViewModel() {
 
     private val _state = MutableStateFlow(ParkState())
     val state = _state.asStateFlow()

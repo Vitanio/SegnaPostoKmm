@@ -1,10 +1,12 @@
-package com.example.segnaposto.domain.viewModel
+package com.example.segnaposto.feature.base
 
+import com.example.segnaposto.util.CloseableCoroutineScope
+import com.example.segnaposto.util.close
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-actual abstract class ViewModel {
+actual abstract class BaseViewModel {
     private var isCleared = false
 
     actual val viewModelScope: CoroutineScope by lazy(::buildScope)

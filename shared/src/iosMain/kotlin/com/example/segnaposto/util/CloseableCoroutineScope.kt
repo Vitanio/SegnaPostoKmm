@@ -1,4 +1,4 @@
-package com.example.segnaposto.domain.viewModel
+package com.example.segnaposto.util
 import app.cash.sqldelight.db.Closeable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
