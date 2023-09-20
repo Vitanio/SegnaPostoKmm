@@ -11,28 +11,60 @@ import kotlin.random.Random
 
 class ParkViewModel(val repository: ParkRepository): BaseViewModel() {
 
-    private val _state = MutableStateFlow(ParkState())
-    val state = _state.asStateFlow()
+    private val _uiEvent = MutableStateFlow(ParkState())
+    val uiEvent = _uiEvent.asStateFlow()
 
-    init {
+    fun onEvent(event: ParkEvent) {
+        when (event) {
+            is ParkEvent.onScreenResumed -> {
+                handleOnScreenResumed()
+            }
+            is ParkEvent.OnAddParkClicked -> {
+                handleOnAddPark()
+            }
+            is ParkEvent.OnParkClicked -> {
+                _uiEvent.update { it.copy(test = "Park clicked") }
+            }
+            is ParkEvent.OnDeleteParkClicked -> {
+                _uiEvent.update { it.copy(test = "Delete park clicked") }
+            }
+
+        }
     }
 
-    fun onParkClicked() {
+    private fun handleOnScreenResumed() {
+        viewModelScope.launch {
+            _uiEvent.update { state ->
+                state.copy(parkHistory = repository.getParkHistory())
+            }
+        }
+    }
 
+    private fun handleOnAddPark() {
         viewModelScope.launch {
             repository.insertPark(createMockedPark())
-        }
 
-        _state.update { it.copy(test = "Update received from shared " + Random.nextInt(10)) }
+            _uiEvent.update { state ->
+                state.copy(parkHistory = repository.getParkHistory())
+            }
+        }
     }
 
-    fun createMockedPark(): Park {
+    private fun createMockedPark(): Park {
         return Park(
             title = "Mola di Bari",
             description = "Via Foggia 78",
-            latitude = 10.0,
-            longitude = 12.0,
+            latitude = Random.nextInt(0,30).toDouble(),
+            longitude = Random.nextInt(0,30).toDouble(),
             date = "Domenica"
         )
     }
+}
+
+sealed class ParkEvent {
+
+    object onScreenResumed: ParkEvent()
+    object OnAddParkClicked: ParkEvent()
+    data class OnParkClicked(val park: Park): ParkEvent()
+    data class OnDeleteParkClicked(val park: Park): ParkEvent()
 }

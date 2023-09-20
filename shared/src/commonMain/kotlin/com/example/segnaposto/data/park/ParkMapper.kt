@@ -5,7 +5,7 @@ import database.ParkEntity
 
 fun ParkEntity.toPark(): Park {
     return Park(
-        id = id,
+        id = id.toString(),
         title = title,
         description = description,
         latitude = latitude,

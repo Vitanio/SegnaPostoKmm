@@ -26,7 +26,7 @@ struct ParkScreen: View {
     }
     
     private func observeState() {
-        viewModel.state.collect(
+        viewModel.uiEvent.collect(
             collector: Collector<ParkState> { state in onStateReceived(state: state) }
         ) { error in
             print("Error ocurred during state collection")
@@ -37,17 +37,55 @@ struct ParkScreen: View {
         self.state.value = state
     }
     
+    @State private var isViewAppeared = false
+    
     var body: some View {
-        List {
-            Button("Next") { viewModel.onParkClicked() }
-            Text("Counter: \(state.value.test)")
+        
+        Button("Add Park Button") { viewModel.onEvent(event: ParkEvent.OnAddParkClicked()) }
+        List(self.state.value.parkHistory, id: \.self) { element in
+            CardView(element: element)
+        }
+        .onAppear {
+            if !isViewAppeared {
+                viewModel.onEvent(event: ParkEvent.onScreenResumed())
+                isViewAppeared = true
+            }
+        }
+        .onDisappear {
+            // Handle the ON_STOP event here if needed
         }
     }
 }
-
+    
 extension ParkViewModel {
     
     func observableState() -> ObservableParkState {
-        return (state.value as! ParkState).wrapAsObservable()
+        return (uiEvent.value as! ParkState).wrapAsObservable()
+    }
+}
+
+struct CardView: View {
+    let element: Park
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Id: \(element.id)")
+                Spacer()
+                Text("Title: \(element.title)")
+            }
+
+            HStack {
+                Text("Latitude: \(element.latitude)")
+                Spacer()
+                Text("Longitude: \(element.longitude)")
+            }
+        }
+        .padding(10)
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .padding([.leading, .trailing], 10)
+        .padding(.top, 5)
     }
 }

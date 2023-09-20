@@ -10,7 +10,7 @@ class SqlDelightParkDataSource(db: ParkDatabase): ParkDataSource {
 
     override suspend fun insertPark(park: Park) {
         queries.insertPark(
-            id = park.id,
+            id = null,
             title = park.title,
             description = park.description,
             latitude = park.latitude,

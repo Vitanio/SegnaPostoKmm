@@ -18,4 +18,8 @@ class ParkRepository(driver: SqlDriver) {
         database.insertPark(park)
     }
 
+    suspend fun getParkHistory(): List<Park> {
+        return database.getAllParks()
+    }
+
 }
