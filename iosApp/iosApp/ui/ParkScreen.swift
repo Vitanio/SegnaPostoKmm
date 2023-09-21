@@ -26,7 +26,7 @@ struct ParkScreen: View {
     }
     
     private func observeState() {
-        viewModel.uiEvent.collect(
+        viewModel.parkState.collect(
             collector: Collector<ParkState> { state in onStateReceived(state: state) }
         ) { error in
             print("Error ocurred during state collection")
@@ -47,7 +47,7 @@ struct ParkScreen: View {
         }
         .onAppear {
             if !isViewAppeared {
-                viewModel.onEvent(event: ParkEvent.onScreenResumed())
+                viewModel.onEvent(event: ParkEvent.OnScreenResumed())
                 isViewAppeared = true
             }
         }
@@ -60,7 +60,7 @@ struct ParkScreen: View {
 extension ParkViewModel {
     
     func observableState() -> ObservableParkState {
-        return (uiEvent.value as! ParkState).wrapAsObservable()
+        return (parkState.value as! ParkState).wrapAsObservable()
     }
 }
 
