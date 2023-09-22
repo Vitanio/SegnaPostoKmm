@@ -5,27 +5,29 @@ import com.example.segnaposto.feature.base.BaseViewModel
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 import com.example.segnaposto.feature.savePark.model.ParkScreenEventState
 import com.example.segnaposto.feature.savePark.model.ParkState
+import com.example.segnaposto.util.PermissionsUtil
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class ParkViewModel(val repository: ParkRepository): BaseViewModel() {
+class ParkViewModel(val repository: ParkRepository, val permissionsUtil: PermissionsUtil): BaseViewModel() {
 
     private val _parkState = MutableStateFlow(ParkState())
     val parkState = _parkState.asStateFlow()
 
-    private val _uiEvent = MutableStateFlow(ParkScreenEventState())
-    val uiEvent = _uiEvent.asStateFlow()
+    private val _uiEvent = Channel<ParkScreenEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     fun onEvent(event: ParkEvent) {
         when (event) {
             is ParkEvent.OnCheckPermission -> {
                 handleOnCheckPermission(
-                    fineLocationGranted = event.fineLocationGranted,
-                    coarseLocationGranted = event.coarseLocationGranted
+                    permission = event.permission,
+                    isGranted = event.isGranted
                 )
             }
             is ParkEvent.OnScreenResumed -> {
@@ -45,9 +47,25 @@ class ParkViewModel(val repository: ParkRepository): BaseViewModel() {
     }
 
     private fun hasAllPermissionGranted(): Boolean = false
-    private fun handleOnCheckPermission(fineLocationGranted: Boolean, coarseLocationGranted: Boolean) {
-        if(fineLocationGranted && coarseLocationGranted) {
-            insertPark()
+
+    private fun isGpsActive(): Boolean = true
+    private fun handleOnCheckPermission(permission: String, isGranted: Boolean) {
+        if(!isGranted) {
+            sendUiEvent(
+                ParkScreenEvent.ShowPermissionDialog(
+                    isVisible = true,
+                    permission = permission
+                ))
+            return
+        }
+
+        sendUiEvent(ParkScreenEvent.ShowPermissionDialog(isVisible = false, permission = ""))
+        handleOnAddPark()
+    }
+
+    private fun sendUiEvent(event: ParkScreenEvent) {
+        viewModelScope.launch {
+            _uiEvent.send(event)
         }
     }
 
@@ -61,11 +79,13 @@ class ParkViewModel(val repository: ParkRepository): BaseViewModel() {
 
     private fun handleOnAddPark() {
 
-        if (!hasAllPermissionGranted()) {
-            _uiEvent.update { state ->
-                state.copy(state = ParkScreenEvent.RequestPermission)
-            }
+        if (!permissionsUtil.hasAllPermissionGranted()) {
+            sendUiEvent(ParkScreenEvent.RequestPermission)
             return
+        }
+
+        if(!isGpsActive()) {
+
         }
 
         insertPark()
@@ -93,7 +113,7 @@ class ParkViewModel(val repository: ParkRepository): BaseViewModel() {
 }
 
 sealed class ParkEvent {
-    data class OnCheckPermission(val fineLocationGranted: Boolean, val coarseLocationGranted: Boolean): ParkEvent()
+    data class OnCheckPermission(val permission: String, val isGranted: Boolean): ParkEvent()
     object OnScreenResumed: ParkEvent()
     object OnAddParkClicked: ParkEvent()
     data class OnParkClicked(val park: Park): ParkEvent()

@@ -2,7 +2,12 @@ package com.example.segnaposto.android.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,10 +31,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
@@ -37,16 +46,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.example.segnaposto.feature.savePark.ParkViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.segnaposto.android.ui.dialog.LocationPermissionTextProvider
+import com.example.segnaposto.android.ui.dialog.PermissionDialog
 import com.example.segnaposto.data.local.DatabaseDriverFactory
 import com.example.segnaposto.feature.savePark.ParkEvent
 import com.example.segnaposto.feature.savePark.ParkRepository
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
+import com.example.segnaposto.util.PermissionsUtil
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ParkScreen(
     navController: NavController,
+    activity: Activity,
     applicationContext: Context
 ) {
 
@@ -54,7 +67,8 @@ fun ParkScreen(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val repository =
                 ParkRepository(DatabaseDriverFactory(applicationContext).createDriver())
-            return ParkViewModel(repository = repository) as T
+            val permissionsUtil = PermissionsUtil(context = activity)
+            return ParkViewModel(repository = repository, permissionsUtil = permissionsUtil) as T
         }
     }
 
@@ -63,31 +77,23 @@ fun ParkScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    val permissionDialog = remember { mutableStateOf(false to "") }
+
     val permissionsToRequest = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { perms ->
-
-            var (fineLocationGranted, coarseLocationGranted) = Pair(false, false)
-
             permissionsToRequest.forEach { permission ->
-                if(permission == Manifest.permission.ACCESS_FINE_LOCATION)
-                    fineLocationGranted = perms[permission] == true
-
-                if(permission == Manifest.permission.ACCESS_COARSE_LOCATION)
-                    coarseLocationGranted = perms[permission] == true
-            }
-
-            viewModel.onEvent(
-                ParkEvent.OnCheckPermission(
-                    fineLocationGranted = fineLocationGranted,
-                    coarseLocationGranted = coarseLocationGranted
+                viewModel.onEvent(
+                    ParkEvent.OnCheckPermission(
+                        permission = permission,
+                        isGranted = perms[permission] == true || viewModel.permissionsUtil.hasAllPermissionGranted()
+                    )
                 )
-            )
+            }
         }
     )
 
@@ -120,16 +126,37 @@ fun ParkScreen(
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
-            when (event.state) {
+            when (event) {
                 is ParkScreenEvent.RequestPermission -> {
                     multiplePermissionResultLauncher.launch(permissionsToRequest)
                 }
                 is ParkScreenEvent.ShowPermissionDialog -> {
-                    Log.d("TEST PERMISSION", "test passed")
+                    permissionDialog.value = event.isVisible to event.permission
                 }
                 else -> {}
             }
         }
+    }
+
+    // ------- Dialog --------
+
+    if (permissionDialog.value.first) {
+        PermissionDialog(
+            permissionTextProvider = LocationPermissionTextProvider(),
+            isPermanentlyDeclined = !shouldShowRequestPermissionRationale(activity,
+                permissionDialog.value.second
+            ),
+            onDismiss = { permissionDialog.value = false to ""},
+            onOkClick = {
+                permissionDialog.value = false to ""
+                multiplePermissionResultLauncher.launch(permissionsToRequest)
+            },
+            onGoToAppSettingsClick = {
+                activity.openAppSettings()
+                permissionDialog.value = false to ""
+                multiplePermissionResultLauncher.launch(permissionsToRequest)
+            }
+        )
     }
 
     Column(
@@ -170,3 +197,11 @@ fun ParkScreen(
         }
     }
 }
+
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
+}
+

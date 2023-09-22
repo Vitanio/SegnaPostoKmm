@@ -83,3 +83,6 @@ android {
         minSdk = 24
     }
 }
+dependencies {
+    implementation("androidx.core:core:1.12.0")
+}
