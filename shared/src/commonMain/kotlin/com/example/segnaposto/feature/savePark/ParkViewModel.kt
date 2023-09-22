@@ -3,7 +3,6 @@ package com.example.segnaposto.feature.savePark
 import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.base.BaseViewModel
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
-import com.example.segnaposto.feature.savePark.model.ParkScreenEventState
 import com.example.segnaposto.feature.savePark.model.ParkState
 import com.example.segnaposto.util.PermissionsUtil
 import kotlinx.coroutines.channels.Channel
