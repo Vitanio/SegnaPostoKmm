@@ -26,15 +26,36 @@ struct ParkScreen: View {
     }
     
     private func observeState() {
+        
         viewModel.parkState.collect(
             collector: Collector<ParkState> { state in onStateReceived(state: state) }
         ) { error in
             print("Error ocurred during state collection")
         }
+        
+        viewModel.uiEvent.collect(
+            collector: Collector<ParkScreenEvent> { state
+                in onUiEventReceived(uiEvent: state)
+            }
+        ) { error in
+            print("Error ocurred during state collection")
+        }
     }
+    
     
     private func onStateReceived(state: ParkState) {
         self.state.value = state
+    }
+    
+    private func onUiEventReceived(uiEvent: ParkScreenEvent) {
+        switch uiEvent {
+        case let event as ParkScreenEvent.RequestPermission:
+            print("Received event: RequestPermission")
+        case let event as ParkScreenEvent.ShowPermissionDialog:
+            print("Received event: ShowPermissionDialog")
+        default:
+            break
+        }
     }
     
     @State private var isViewAppeared = false

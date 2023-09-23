@@ -21,6 +21,7 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
     private val _uiEvent = Channel<ParkScreenEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+
     fun onEvent(event: ParkEvent) {
         when (event) {
             is ParkEvent.OnCheckPermission -> {
