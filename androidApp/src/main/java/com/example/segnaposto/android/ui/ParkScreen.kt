@@ -74,7 +74,7 @@ fun ParkScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val permissionDialog = remember { mutableStateOf(false to "") }
+    val permissionDialog = remember { mutableStateOf(false to false) } // show dialog, show rationale
 
     val permissionsToRequest = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -121,7 +121,7 @@ fun ParkScreen(
                     multiplePermissionResultLauncher.launch(permissionsToRequest)
                 }
                 is ParkScreenEvent.ShowPermissionDialog -> {
-                    permissionDialog.value = event.isVisible to event.permission
+                    permissionDialog.value = event.isVisible to event.isRationale
                 }
                 else -> {}
             }
@@ -133,18 +133,15 @@ fun ParkScreen(
     if (permissionDialog.value.first) {
         PermissionDialog(
             permissionTextProvider = LocationPermissionTextProvider(),
-            isPermanentlyDeclined = !shouldShowRequestPermissionRationale(activity,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ),
-            onDismiss = { permissionDialog.value = false to ""},
+            isPermanentlyDeclined = permissionDialog.value.second,
+            onDismiss = { permissionDialog.value = false to false},
             onOkClick = {
-                permissionDialog.value = false to ""
+                permissionDialog.value = false to false
                 multiplePermissionResultLauncher.launch(permissionsToRequest)
             },
             onGoToAppSettingsClick = {
-                activity.openAppSettings()
-                permissionDialog.value = false to ""
-                multiplePermissionResultLauncher.launch(permissionsToRequest)
+                viewModel.onEvent(event = ParkEvent.OnGoToSettingsClicked)
+                permissionDialog.value = false to false
             }
         )
     }

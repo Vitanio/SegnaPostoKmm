@@ -1,6 +1,10 @@
 package com.example.segnaposto.util
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
+import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocationManager
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
+import platform.UIKit.UIApplicationOpenSettingsURLString
 
 actual class PermissionsUtil {
 
@@ -29,5 +33,12 @@ actual class PermissionsUtil {
 
     actual fun requestPermission(event: (ParkScreenEvent) -> Unit) {
         locationManager.requestWhenInUseAuthorization()
+    }
+
+    actual fun openAppSettings() {
+        val url = NSURL(string = UIApplicationOpenSettingsURLString)
+
+        if(UIApplication.sharedApplication().canOpenURL(url))
+            UIApplication.sharedApplication.openURL(url)
     }
 }

@@ -12,23 +12,34 @@ import CoreLocation
 
 class LocationPermission:NSObject, ObservableObject, CLLocationManagerDelegate {
     
+    let function: () -> Void
+    
     @Published var authorizationStatus : CLAuthorizationStatus = .notDetermined
     private let locationManager = CLLocationManager()
     @Published var cordinates : CLLocationCoordinate2D?
     
-    override init() {
+    init(addParkFunction: @escaping () -> Void) {
+        self.function = addParkFunction
         super.init()
+        
         locationManager.delegate=self
         locationManager.desiredAccuracy=kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
     }
     
-    func requestLocationPermission()  {
-        locationManager.requestWhenInUseAuthorization()
-    }
-    
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
+        
+        switch authorizationStatus{
+            case .authorizedAlways:
+                self.function()
+            case .authorizedWhenInUse:
+                self.function()
+            case .authorized:
+                self.function()
+            default:
+                break;
+            }
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

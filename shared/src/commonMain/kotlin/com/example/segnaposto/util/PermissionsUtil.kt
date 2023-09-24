@@ -10,6 +10,8 @@ expect class PermissionsUtil {
 
     /* directly request the permission */
     fun requestPermission(event: (ParkScreenEvent) -> Unit)
+
+    fun openAppSettings()
 }
 
 sealed class PermissionStatus {

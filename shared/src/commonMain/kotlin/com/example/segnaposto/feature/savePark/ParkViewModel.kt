@@ -25,17 +25,14 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
 
     fun onEvent(event: ParkEvent) {
         when (event) {
-            is ParkEvent.OnCheckPermission -> {
-                handleOnCheckPermission(
-                    permission = event.permission,
-                    isGranted = event.isGranted
-                )
-            }
             is ParkEvent.OnScreenResumed -> {
                 handleOnScreenResumed()
             }
             is ParkEvent.OnAddParkClicked -> {
                 handleOnAddPark()
+            }
+            is ParkEvent.OnGoToSettingsClicked -> {
+                handleOnGoToSettings()
             }
             is ParkEvent.OnParkClicked -> {
                 _parkState.update { it.copy(test = "Park clicked") }
@@ -48,19 +45,6 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
     }
 
     private fun isGpsActive(): Boolean = true
-    private fun handleOnCheckPermission(permission: String, isGranted: Boolean) {
-        if(!isGranted) {
-            sendUiEvent(
-                ParkScreenEvent.ShowPermissionDialog(
-                    isVisible = true,
-                    permission = permission
-                ))
-            return
-        }
-
-        sendUiEvent(ParkScreenEvent.ShowPermissionDialog(isVisible = false, permission = ""))
-        handleOnAddPark()
-    }
 
     private fun sendUiEvent(event: ParkScreenEvent) {
         viewModelScope.launch {
@@ -76,6 +60,10 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
         }
     }
 
+    private fun handleOnGoToSettings() {
+        permissionsUtil.openAppSettings()
+    }
+
     private fun handleOnAddPark() {
         viewModelScope.launch {
 
@@ -86,32 +74,26 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
                     permissionsUtil.requestPermission {
                         sendUiEvent(ParkScreenEvent.RequestPermission)
                     }
-                    return@launch
                 }
                 PermissionStatus.Denied -> {
                     sendUiEvent(
                         ParkScreenEvent.ShowPermissionDialog(
                             isVisible = true,
-                            permission = ""
+                            isRationale = false
                         ))
-                    return@launch
                 }
                 PermissionStatus.AndroidDontAskAgain -> {
                     sendUiEvent(
                         ParkScreenEvent.ShowPermissionDialog(
                             isVisible = true,
-                            permission = ""
+                            isRationale = true
                         ))
-                    return@launch
                 }
                 PermissionStatus.Granted -> {
-
+                    insertPark()
                 }
             }
-
-            insertPark()
         }
-
     }
 
     private fun insertPark() {
@@ -136,9 +118,9 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
 }
 
 sealed class ParkEvent {
-    data class OnCheckPermission(val permission: String, val isGranted: Boolean): ParkEvent()
     object OnScreenResumed: ParkEvent()
     object OnAddParkClicked: ParkEvent()
+    object OnGoToSettingsClicked: ParkEvent()
     data class OnParkClicked(val park: Park): ParkEvent()
     data class OnDeleteParkClicked(val park: Park): ParkEvent()
 }

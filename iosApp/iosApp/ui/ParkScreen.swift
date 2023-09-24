@@ -16,7 +16,7 @@ struct ParkScreen: View {
     @ObservedObject private var uiElements: ObservableUiElementState
     
     
-    @StateObject private var locationPermission:LocationPermission = LocationPermission()
+    @ObservedObject private var locationPermission:LocationPermission
     
     private let viewModel: ParkViewModel
     private let onNext: () -> Void
@@ -30,25 +30,23 @@ struct ParkScreen: View {
         self.state = viewModel.observableState()
         self.uiEvent = ObservableUiEventState(state: ParkScreenEvent.InitialState())
         self.uiElements = ObservableUiElementState(value: UiElement(requestPermission: false, showPermissionDialog: false))
-        
+        self.locationPermission = LocationPermission{
+            viewModel.onEvent(event: ParkEvent.OnAddParkClicked())
+            
+        }
         observeState()
     }
     
     private func observeState() {
         
-        viewModel.parkState.collect(
-            collector: Collector<ParkState> { state in onStateReceived(state: state) }
-        ) { error in
+        viewModel.parkState.collect(collector: Collector<ParkState> { state in onStateReceived(state: state) }) { error in
             print("Error ocurred during state collection")
         }
         
-        viewModel.uiEvent.collect(
-            collector: Collector<ParkScreenEvent> { state
-                in onUiEventReceived(uiEvent: state)
-            }
-        ) { error in
+        viewModel.uiEvent.collect(collector: Collector<ParkScreenEvent> { state in onUiEventReceived(uiEvent: state)}) { error in
             print("Error ocurred during state collection")
         }
+        
     }
     
     
@@ -60,8 +58,6 @@ struct ParkScreen: View {
         self.uiEvent.state = uiEvent
         
         switch self.uiEvent.state {
-        case _ as ParkScreenEvent.RequestPermission:
-            self.uiElements.value = UiElement(requestPermission: true, showPermissionDialog: false)
         case _ as ParkScreenEvent.ShowPermissionDialog:
             self.uiElements.value = UiElement(requestPermission: false, showPermissionDialog: true)
         default:
@@ -77,7 +73,8 @@ struct ParkScreen: View {
             PermissionDialog(
                 title: "Access location?",
                 message: "This lets you choose which photos you want to add to this project.",
-                buttonTitle: "Give Access") {
+                buttonTitle: "Go to Settings") {
+                    viewModel.onEvent(event: ParkEvent.OnGoToSettingsClicked())
                     self.uiElements.value = UiElement(requestPermission: false, showPermissionDialog: false)
                 }
         }else{

@@ -3,7 +3,10 @@ package com.example.segnaposto.util
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.segnaposto.feature.savePark.ParkEvent
@@ -12,13 +15,8 @@ import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 
 actual class PermissionsUtil(private val context: Context) {
 
-    actual var hasToGrantFirstTimePermission: Boolean = false
-        get() = hasToGrantPermission()
-
-    actual var hasDeniedPermission: Boolean = false
-        get() = hasDeniedPermission()
-
-    private val sharedPreferences = context.getSharedPreferences("PermissionsUtil", Context.MODE_PRIVATE)
+    private val sharedPreferences =
+        context.getSharedPreferences("PermissionsUtil", Context.MODE_PRIVATE)
 
     actual fun getLocationStatus(): PermissionStatus {
 
@@ -59,7 +57,12 @@ actual class PermissionsUtil(private val context: Context) {
         event.invoke(ParkScreenEvent.RequestPermission)
     }
 
-
-
-
+    actual fun openAppSettings() {
+        Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", context.packageName, null)
+        ).also {
+            context.startActivity(it)
+        }
+    }
 }

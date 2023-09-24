@@ -7,5 +7,5 @@ data class ParkScreenEventState(
 sealed class ParkScreenEvent {
     object InitialState: ParkScreenEvent()
     object RequestPermission: ParkScreenEvent()
-    data class ShowPermissionDialog(val isVisible: Boolean, val permission: String) : ParkScreenEvent()
+    data class ShowPermissionDialog(val isVisible: Boolean, val isRationale: Boolean) : ParkScreenEvent()
 }
