@@ -1,27 +1,33 @@
 package com.example.segnaposto.util
-
+import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 import platform.CoreLocation.CLLocationManager
 
 actual class PermissionsUtil {
-    actual fun hasAllPermissionGranted(): Boolean {
 
-        val locationManager = CLLocationManager()
+    private val locationManager = CLLocationManager()
 
-        if (CLLocationManager.locationServicesEnabled()) {
+    actual fun getLocationStatus(): PermissionStatus {
+        return if (CLLocationManager.locationServicesEnabled()) {
             return when (locationManager.authorizationStatus) {
-                0, 1, 2 -> { // notDetermined, restricted, denied
-                    false
+                0 -> { // notDetermined,
+                    PermissionStatus.NotYetRequested
                 }
-
+                1, 2 -> { // restricted, denied
+                    PermissionStatus.Denied
+                }
                 3, 4 -> { // authorizedAlways, authorizedWhenInUse
-                    true
+                    PermissionStatus.Granted
                 }
                 else -> {
-                    false
+                    PermissionStatus.Denied
                 }
             }
         }else{
-            return false
+          PermissionStatus.Denied
         }
+    }
+
+    actual fun requestPermission(event: (ParkScreenEvent) -> Unit) {
+        locationManager.requestWhenInUseAuthorization()
     }
 }

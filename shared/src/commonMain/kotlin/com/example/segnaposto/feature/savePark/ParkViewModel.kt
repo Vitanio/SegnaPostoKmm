@@ -4,6 +4,7 @@ import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.base.BaseViewModel
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 import com.example.segnaposto.feature.savePark.model.ParkState
+import com.example.segnaposto.util.PermissionStatus
 import com.example.segnaposto.util.PermissionsUtil
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,8 +47,6 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
         }
     }
 
-    private fun hasAllPermissionGranted(): Boolean = false
-
     private fun isGpsActive(): Boolean = true
     private fun handleOnCheckPermission(permission: String, isGranted: Boolean) {
         if(!isGranted) {
@@ -78,17 +77,41 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
     }
 
     private fun handleOnAddPark() {
+        viewModelScope.launch {
 
-        if (!permissionsUtil.hasAllPermissionGranted()) {
-            sendUiEvent(ParkScreenEvent.RequestPermission)
-            return
+            val locationStatus = permissionsUtil.getLocationStatus()
+
+            when(locationStatus){
+                PermissionStatus.NotYetRequested -> {
+                    permissionsUtil.requestPermission {
+                        sendUiEvent(ParkScreenEvent.RequestPermission)
+                    }
+                    return@launch
+                }
+                PermissionStatus.Denied -> {
+                    sendUiEvent(
+                        ParkScreenEvent.ShowPermissionDialog(
+                            isVisible = true,
+                            permission = ""
+                        ))
+                    return@launch
+                }
+                PermissionStatus.AndroidDontAskAgain -> {
+                    sendUiEvent(
+                        ParkScreenEvent.ShowPermissionDialog(
+                            isVisible = true,
+                            permission = ""
+                        ))
+                    return@launch
+                }
+                PermissionStatus.Granted -> {
+
+                }
+            }
+
+            insertPark()
         }
 
-        if(!isGpsActive()) {
-
-        }
-
-        insertPark()
     }
 
     private fun insertPark() {

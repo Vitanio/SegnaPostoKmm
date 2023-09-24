@@ -11,6 +11,11 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		CB57C5A12ABF400E00BF8F69 /* UiElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB57C5A02ABF400E00BF8F69 /* UiElement.swift */; };
+		CB57C5A32ABF40FF00BF8F69 /* ObservableUiElementState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB57C5A22ABF40FF00BF8F69 /* ObservableUiElementState.swift */; };
+		CB6DB0732ABEF79E00315A2D /* LocationPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6DB0722ABEF79E00315A2D /* LocationPermission.swift */; };
+		CB6DB0752ABF2FF700315A2D /* ObservableUiEventState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6DB0742ABF2FF700315A2D /* ObservableUiEventState.swift */; };
+		CB6DB07A2ABF39F000315A2D /* PermissionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6DB0792ABF39F000315A2D /* PermissionDialog.swift */; };
 		CBC8F84A2AB6F92700054B2A /* ParkScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC8F8492AB6F92700054B2A /* ParkScreen.swift */; };
 		CBC8F84D2AB6F96900054B2A /* ObservableParkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC8F84C2AB6F96900054B2A /* ObservableParkState.swift */; };
 		CBC8F84F2AB6FA5500054B2A /* Collector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC8F84E2AB6FA5500054B2A /* Collector.swift */; };
@@ -36,6 +41,11 @@
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CB57C5A02ABF400E00BF8F69 /* UiElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UiElement.swift; sourceTree = "<group>"; };
+		CB57C5A22ABF40FF00BF8F69 /* ObservableUiElementState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableUiElementState.swift; sourceTree = "<group>"; };
+		CB6DB0722ABEF79E00315A2D /* LocationPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermission.swift; sourceTree = "<group>"; };
+		CB6DB0742ABF2FF700315A2D /* ObservableUiEventState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableUiEventState.swift; sourceTree = "<group>"; };
+		CB6DB0792ABF39F000315A2D /* PermissionDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionDialog.swift; sourceTree = "<group>"; };
 		CBC8F8492AB6F92700054B2A /* ParkScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkScreen.swift; sourceTree = "<group>"; };
 		CBC8F84C2AB6F96900054B2A /* ObservableParkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableParkState.swift; sourceTree = "<group>"; };
 		CBC8F84E2AB6FA5500054B2A /* Collector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collector.swift; sourceTree = "<group>"; };
@@ -80,6 +90,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				CB6DB0712ABEF78A00315A2D /* location */,
 				CBC8F84B2AB6F95600054B2A /* utils */,
 				CBC8F8462AB6F8EE00054B2A /* ui */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
@@ -98,9 +109,35 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		CB57C59F2ABF3FFB00BF8F69 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				CB57C5A02ABF400E00BF8F69 /* UiElement.swift */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
+		CB6DB0712ABEF78A00315A2D /* location */ = {
+			isa = PBXGroup;
+			children = (
+				CB6DB0722ABEF79E00315A2D /* LocationPermission.swift */,
+			);
+			path = location;
+			sourceTree = "<group>";
+		};
+		CB6DB0762ABF388100315A2D /* dialog */ = {
+			isa = PBXGroup;
+			children = (
+				CB6DB0792ABF39F000315A2D /* PermissionDialog.swift */,
+			);
+			path = dialog;
+			sourceTree = "<group>";
+		};
 		CBC8F8462AB6F8EE00054B2A /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				CB57C59F2ABF3FFB00BF8F69 /* model */,
+				CB6DB0762ABF388100315A2D /* dialog */,
 				CBC8F8492AB6F92700054B2A /* ParkScreen.swift */,
 			);
 			path = ui;
@@ -111,6 +148,8 @@
 			children = (
 				CBC8F84C2AB6F96900054B2A /* ObservableParkState.swift */,
 				CBC8F84E2AB6FA5500054B2A /* Collector.swift */,
+				CB6DB0742ABF2FF700315A2D /* ObservableUiEventState.swift */,
+				CB57C5A22ABF40FF00BF8F69 /* ObservableUiElementState.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -207,11 +246,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB57C5A12ABF400E00BF8F69 /* UiElement.swift in Sources */,
 				CBC8F84D2AB6F96900054B2A /* ObservableParkState.swift in Sources */,
 				CBC8F84F2AB6FA5500054B2A /* Collector.swift in Sources */,
+				CB57C5A32ABF40FF00BF8F69 /* ObservableUiElementState.swift in Sources */,
+				CB6DB07A2ABF39F000315A2D /* PermissionDialog.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
+				CB6DB0752ABF2FF700315A2D /* ObservableUiEventState.swift in Sources */,
 				CBC8F84A2AB6F92700054B2A /* ParkScreen.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				CB6DB0732ABEF79E00315A2D /* LocationPermission.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

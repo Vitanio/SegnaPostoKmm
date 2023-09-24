@@ -82,15 +82,8 @@ fun ParkScreen(
 
     val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { perms ->
-            permissionsToRequest.forEach { permission ->
-                viewModel.onEvent(
-                    ParkEvent.OnCheckPermission(
-                        permission = permission,
-                        isGranted = perms[permission] == true || viewModel.permissionsUtil.hasAllPermissionGranted()
-                    )
-                )
-            }
+        onResult = { _ ->
+            viewModel.onEvent(event = ParkEvent.OnAddParkClicked)
         }
     )
 
@@ -141,7 +134,7 @@ fun ParkScreen(
         PermissionDialog(
             permissionTextProvider = LocationPermissionTextProvider(),
             isPermanentlyDeclined = !shouldShowRequestPermissionRationale(activity,
-                permissionDialog.value.second
+                Manifest.permission.ACCESS_FINE_LOCATION
             ),
             onDismiss = { permissionDialog.value = false to ""},
             onOkClick = {
