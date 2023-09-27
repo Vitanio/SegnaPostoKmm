@@ -13,7 +13,7 @@ import com.example.segnaposto.feature.savePark.ParkEvent
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 
 
-actual class PermissionsUtil(private val context: Context) {
+actual class LocationManager(private val context: Context) {
 
     private val sharedPreferences =
         context.getSharedPreferences("PermissionsUtil", Context.MODE_PRIVATE)
@@ -64,5 +64,18 @@ actual class PermissionsUtil(private val context: Context) {
         ).also {
             context.startActivity(it)
         }
+    }
+
+    actual fun getLocationPowerStatus(): LocationPowerStatus {
+        return if(getLocationMode(context) != Settings.Secure.LOCATION_MODE_OFF) LocationPowerStatus.On else LocationPowerStatus.Off
+    }
+
+    private fun getLocationMode(context: Context): Int {
+        var locationMode = Settings.Secure.LOCATION_MODE_OFF
+        try {
+            locationMode =
+                Settings.Secure.getInt(context.contentResolver, Settings.Secure.LOCATION_MODE)
+        } catch (_: Settings.SettingNotFoundException) {}
+        return locationMode
     }
 }

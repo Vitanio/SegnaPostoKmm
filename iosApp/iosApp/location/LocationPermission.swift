@@ -20,7 +20,7 @@ class LocationPermission:NSObject, ObservableObject, CLLocationManagerDelegate {
     
     init(addParkFunction: @escaping () -> Void) {
         self.function = addParkFunction
-        super.init()
+        super.init() 
         
         locationManager.delegate=self
         locationManager.desiredAccuracy=kCLLocationAccuracyBest
@@ -34,8 +34,6 @@ class LocationPermission:NSObject, ObservableObject, CLLocationManagerDelegate {
             case .authorizedAlways:
                 self.function()
             case .authorizedWhenInUse:
-                self.function()
-            case .authorized:
                 self.function()
             default:
                 break;

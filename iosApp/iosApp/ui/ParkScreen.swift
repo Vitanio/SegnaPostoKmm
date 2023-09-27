@@ -82,6 +82,7 @@ struct ParkScreen: View {
             List(self.state.value.parkHistory, id: \.self) { element in
                 CardView(element: element)
             }
+            .listRowBackground(Color.clear)
             .onAppear {
                 if !isViewAppeared {
                     viewModel.onEvent(event: ParkEvent.OnScreenResumed())

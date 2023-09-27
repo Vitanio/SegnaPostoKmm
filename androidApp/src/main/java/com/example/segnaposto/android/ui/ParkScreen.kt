@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
@@ -43,13 +42,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.example.segnaposto.feature.savePark.ParkViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.segnaposto.android.ui.dialog.BaseDialog
 import com.example.segnaposto.android.ui.dialog.LocationPermissionTextProvider
 import com.example.segnaposto.android.ui.dialog.PermissionDialog
 import com.example.segnaposto.data.local.DatabaseDriverFactory
+import com.example.segnaposto.dialog.BaseTextProvider
 import com.example.segnaposto.feature.savePark.ParkEvent
 import com.example.segnaposto.feature.savePark.ParkRepository
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
-import com.example.segnaposto.util.PermissionsUtil
+import com.example.segnaposto.util.LocationManager
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,8 +65,8 @@ fun ParkScreen(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val repository =
                 ParkRepository(DatabaseDriverFactory(applicationContext).createDriver())
-            val permissionsUtil = PermissionsUtil(context = activity)
-            return ParkViewModel(repository = repository, permissionsUtil = permissionsUtil) as T
+            val permissionsUtil = LocationManager(context = activity)
+            return ParkViewModel(repository = repository, locationManager = permissionsUtil) as T
         }
     }
 
@@ -75,6 +76,7 @@ fun ParkScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val permissionDialog = remember { mutableStateOf(false to false) } // show dialog, show rationale
+    val baseDialog = remember { mutableStateOf(false to BaseTextProvider()) } // show dialog, text provider
 
     val permissionsToRequest = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -123,6 +125,9 @@ fun ParkScreen(
                 is ParkScreenEvent.ShowPermissionDialog -> {
                     permissionDialog.value = event.isVisible to event.isRationale
                 }
+                is ParkScreenEvent.ShowDialog -> {
+                    baseDialog.value = true to event.textProvider
+                }
                 else -> {}
             }
         }
@@ -142,6 +147,16 @@ fun ParkScreen(
             onGoToAppSettingsClick = {
                 viewModel.onEvent(event = ParkEvent.OnGoToSettingsClicked)
                 permissionDialog.value = false to false
+            }
+        )
+    }
+
+    if (baseDialog.value.first) {
+        BaseDialog(
+            textProvider = baseDialog.value.second,
+            onDismiss = { baseDialog.value = false to BaseTextProvider() },
+            onOkClick = {
+                baseDialog.value = false to BaseTextProvider()
             }
         )
     }

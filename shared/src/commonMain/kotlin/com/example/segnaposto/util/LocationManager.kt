@@ -1,12 +1,13 @@
 package com.example.segnaposto.util
 
-import com.example.segnaposto.Platform
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 
 
-expect class PermissionsUtil {
+expect class LocationManager {
 
     fun getLocationStatus(): PermissionStatus
+
+    fun getLocationPowerStatus(): LocationPowerStatus
 
     /* directly request the permission */
     fun requestPermission(event: (ParkScreenEvent) -> Unit)
@@ -28,4 +29,9 @@ sealed class PermissionStatus {
             is Denied -> "Denied"
         }
     }
+}
+
+sealed class LocationPowerStatus {
+    object On: LocationPowerStatus()
+    object Off: LocationPowerStatus()
 }

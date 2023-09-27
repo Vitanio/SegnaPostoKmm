@@ -6,7 +6,7 @@ import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
 
-actual class PermissionsUtil {
+actual class LocationManager {
 
     private val locationManager = CLLocationManager()
 
@@ -29,6 +29,10 @@ actual class PermissionsUtil {
         }else{
           PermissionStatus.Denied
         }
+    }
+
+    actual fun getLocationPowerStatus(): LocationPowerStatus {
+        return LocationPowerStatus.On // always true
     }
 
     actual fun requestPermission(event: (ParkScreenEvent) -> Unit) {

@@ -1,11 +1,13 @@
 package com.example.segnaposto.feature.savePark
 
+import com.example.segnaposto.dialog.LocationPowerStatusTextProvider
 import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.base.BaseViewModel
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 import com.example.segnaposto.feature.savePark.model.ParkState
 import com.example.segnaposto.util.PermissionStatus
-import com.example.segnaposto.util.PermissionsUtil
+import com.example.segnaposto.util.LocationManager
+import com.example.segnaposto.util.LocationPowerStatus
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class ParkViewModel(val repository: ParkRepository, val permissionsUtil: PermissionsUtil): BaseViewModel() {
+class ParkViewModel(val repository: ParkRepository, val locationManager: LocationManager): BaseViewModel() {
 
     private val _parkState = MutableStateFlow(ParkState())
     val parkState = _parkState.asStateFlow()
@@ -61,17 +63,18 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
     }
 
     private fun handleOnGoToSettings() {
-        permissionsUtil.openAppSettings()
+        locationManager.openAppSettings()
     }
 
     private fun handleOnAddPark() {
         viewModelScope.launch {
 
-            val locationStatus = permissionsUtil.getLocationStatus()
+            val locationStatus = locationManager.getLocationStatus()
+            val locationPowerStatus = locationManager.getLocationPowerStatus()
 
             when(locationStatus){
                 PermissionStatus.NotYetRequested -> {
-                    permissionsUtil.requestPermission {
+                    locationManager.requestPermission {
                         sendUiEvent(ParkScreenEvent.RequestPermission)
                     }
                 }
@@ -90,7 +93,16 @@ class ParkViewModel(val repository: ParkRepository, val permissionsUtil: Permiss
                         ))
                 }
                 PermissionStatus.Granted -> {
-                    insertPark()
+                    when(locationPowerStatus){
+                        LocationPowerStatus.On -> {
+                            insertPark()
+                        }
+                        LocationPowerStatus.Off -> {
+                            sendUiEvent(
+                                ParkScreenEvent.ShowDialog(textProvider = LocationPowerStatusTextProvider())
+                            )
+                        }
+                    }
                 }
             }
         }
