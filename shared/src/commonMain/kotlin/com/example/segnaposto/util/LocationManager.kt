@@ -9,6 +9,8 @@ expect class LocationManager {
 
     fun getLocationPowerStatus(): LocationPowerStatus
 
+    fun getLocationCoordinates(onResultListener: (LocationCoordinates?) -> Unit)
+
     /* directly request the permission */
     fun requestPermission(event: (ParkScreenEvent) -> Unit)
 
@@ -35,3 +37,8 @@ sealed class LocationPowerStatus {
     object On: LocationPowerStatus()
     object Off: LocationPowerStatus()
 }
+
+data class LocationCoordinates(
+    var latitude: Double,
+    var longitude: Double
+)

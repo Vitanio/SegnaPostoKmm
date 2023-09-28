@@ -79,7 +79,8 @@ fun ParkScreen(
     val baseDialog = remember { mutableStateOf(false to BaseTextProvider()) } // show dialog, text provider
 
     val permissionsToRequest = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
     val multiplePermissionResultLauncher = rememberLauncherForActivityResult(

@@ -5,6 +5,7 @@ import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.base.BaseViewModel
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 import com.example.segnaposto.feature.savePark.model.ParkState
+import com.example.segnaposto.util.LocationCoordinates
 import com.example.segnaposto.util.PermissionStatus
 import com.example.segnaposto.util.LocationManager
 import com.example.segnaposto.util.LocationPowerStatus
@@ -14,9 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
-class ParkViewModel(val repository: ParkRepository, val locationManager: LocationManager): BaseViewModel() {
+class ParkViewModel(val repository: ParkRepository, val locationManager: LocationManager) :
+    BaseViewModel() {
 
     private val _parkState = MutableStateFlow(ParkState())
     val parkState = _parkState.asStateFlow()
@@ -30,15 +31,19 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             is ParkEvent.OnScreenResumed -> {
                 handleOnScreenResumed()
             }
+
             is ParkEvent.OnAddParkClicked -> {
                 handleOnAddPark()
             }
+
             is ParkEvent.OnGoToSettingsClicked -> {
                 handleOnGoToSettings()
             }
+
             is ParkEvent.OnParkClicked -> {
                 _parkState.update { it.copy(test = "Park clicked") }
             }
+
             is ParkEvent.OnDeleteParkClicked -> {
                 _parkState.update { it.copy(test = "Delete park clicked") }
             }
@@ -72,31 +77,37 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             val locationStatus = locationManager.getLocationStatus()
             val locationPowerStatus = locationManager.getLocationPowerStatus()
 
-            when(locationStatus){
+            when (locationStatus) {
                 PermissionStatus.NotYetRequested -> {
                     locationManager.requestPermission {
                         sendUiEvent(ParkScreenEvent.RequestPermission)
                     }
                 }
+
                 PermissionStatus.Denied -> {
                     sendUiEvent(
                         ParkScreenEvent.ShowPermissionDialog(
                             isVisible = true,
                             isRationale = false
-                        ))
+                        )
+                    )
                 }
+
                 PermissionStatus.AndroidDontAskAgain -> {
                     sendUiEvent(
                         ParkScreenEvent.ShowPermissionDialog(
                             isVisible = true,
                             isRationale = true
-                        ))
+                        )
+                    )
                 }
+
                 PermissionStatus.Granted -> {
-                    when(locationPowerStatus){
+                    when (locationPowerStatus) {
                         LocationPowerStatus.On -> {
                             insertPark()
                         }
+
                         LocationPowerStatus.Off -> {
                             sendUiEvent(
                                 ParkScreenEvent.ShowDialog(textProvider = LocationPowerStatusTextProvider())
@@ -109,30 +120,37 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
     }
 
     private fun insertPark() {
-        viewModelScope.launch {
-            repository.insertPark(createMockedPark())
 
-            _parkState.update { state ->
-                state.copy(parkHistory = repository.getParkHistory())
+        val locationCoordinates = locationManager.getLocationCoordinates { location ->
+            viewModelScope.launch {
+                if (location != null) {
+                    repository.insertPark(parkBuilder(location))
+
+                    _parkState.update { state ->
+                        state.copy(parkHistory = repository.getParkHistory())
+                    }
+                }else{
+                    // TODO: Show alert
+                }
             }
         }
     }
 
-    private fun createMockedPark(): Park {
+    private fun parkBuilder(locationCoordinates: LocationCoordinates): Park {
         return Park(
             title = "Mola di Bari",
             description = "Via Foggia 78",
-            latitude = Random.nextInt(0,30).toDouble(),
-            longitude = Random.nextInt(0,30).toDouble(),
+            latitude = locationCoordinates.latitude,
+            longitude = locationCoordinates.longitude,
             date = "Domenica"
         )
     }
 }
 
 sealed class ParkEvent {
-    object OnScreenResumed: ParkEvent()
-    object OnAddParkClicked: ParkEvent()
-    object OnGoToSettingsClicked: ParkEvent()
-    data class OnParkClicked(val park: Park): ParkEvent()
-    data class OnDeleteParkClicked(val park: Park): ParkEvent()
+    object OnScreenResumed : ParkEvent()
+    object OnAddParkClicked : ParkEvent()
+    object OnGoToSettingsClicked : ParkEvent()
+    data class OnParkClicked(val park: Park) : ParkEvent()
+    data class OnDeleteParkClicked(val park: Park) : ParkEvent()
 }

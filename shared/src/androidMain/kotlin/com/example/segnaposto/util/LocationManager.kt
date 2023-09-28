@@ -1,10 +1,12 @@
 package com.example.segnaposto.util
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
@@ -12,6 +14,11 @@ import androidx.core.content.ContextCompat
 import com.example.segnaposto.feature.savePark.ParkEvent
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.OnSuccessListener
 
 actual class LocationManager(private val context: Context) {
 
@@ -42,17 +49,6 @@ actual class LocationManager(private val context: Context) {
         return returnValue
     }
 
-    private fun hasToGrantPermission(): Boolean {
-        return !ActivityCompat.shouldShowRequestPermissionRationale(context as Activity,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) && hasDeniedPermission()
-    }
-
-    private fun hasDeniedPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(context,
-            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
-    }
-
     actual fun requestPermission(event: (ParkScreenEvent) -> Unit) {
         event.invoke(ParkScreenEvent.RequestPermission)
     }
@@ -70,6 +66,37 @@ actual class LocationManager(private val context: Context) {
         return if(getLocationMode(context) != Settings.Secure.LOCATION_MODE_OFF) LocationPowerStatus.On else LocationPowerStatus.Off
     }
 
+    @SuppressLint("MissingPermission")
+    actual fun getLocationCoordinates(onResultListener: (LocationCoordinates?) -> Unit) {
+
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        var locationCoordinates: LocationCoordinates? = null
+
+        fusedLocationClient
+            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    locationCoordinates = LocationCoordinates(
+                        latitude = location.latitude,
+                        longitude = location.longitude
+                    )
+                }
+
+                onResultListener.invoke(locationCoordinates)
+        }
+    }
+
+    private fun hasToGrantPermission(): Boolean {
+        return !ActivityCompat.shouldShowRequestPermissionRationale(context as Activity,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) && hasDeniedPermission()
+    }
+
+    private fun hasDeniedPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(context,
+            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
+    }
+
     private fun getLocationMode(context: Context): Int {
         var locationMode = Settings.Secure.LOCATION_MODE_OFF
         try {
@@ -78,4 +105,6 @@ actual class LocationManager(private val context: Context) {
         } catch (_: Settings.SettingNotFoundException) {}
         return locationMode
     }
+
+
 }
