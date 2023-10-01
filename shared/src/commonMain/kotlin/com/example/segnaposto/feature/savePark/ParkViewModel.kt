@@ -123,7 +123,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
     private fun insertPark() {
 
         // TODO: Show spinner
-        
+
         locationManager.getLocationCoordinates { location ->
             viewModelScope.launch {
                 locationManager.stopUpdatingLocation()
@@ -142,8 +142,8 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
 
     private fun parkBuilder(locationCoordinates: LocationCoordinates): Park {
         return Park(
-            title = "Mola di Bari",
-            description = "Via Foggia 78",
+            title = locationCoordinates.locationInfo?.locality?:"N/A",
+            description = locationCoordinates.locationInfo?.address?:"N/A",
             latitude = locationCoordinates.latitude,
             longitude = locationCoordinates.longitude,
             date = "Domenica"

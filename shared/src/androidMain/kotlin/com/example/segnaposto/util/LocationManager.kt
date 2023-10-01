@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.provider.Settings
@@ -19,6 +21,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.OnSuccessListener
+import java.util.Locale
 
 actual class LocationManager(private val context: Context) {
 
@@ -76,7 +79,7 @@ actual class LocationManager(private val context: Context) {
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    locationCoordinates = LocationCoordinates(
+                    locationCoordinates = addLocationExtraInfoIfPresent(
                         latitude = location.latitude,
                         longitude = location.longitude
                     )
@@ -84,6 +87,22 @@ actual class LocationManager(private val context: Context) {
 
                 onResultListener.invoke(locationCoordinates)
         }
+    }
+
+    private fun addLocationExtraInfoIfPresent(latitude: Double, longitude: Double): LocationCoordinates {
+        // TODO: Need to be done async android
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+
+        return LocationCoordinates(
+            latitude = latitude,
+            longitude = longitude,
+            locationInfo = LocationCoordinates.LocationInfo(
+                locality = addresses?.first()?.locality,
+                address = addresses?.first()?.thoroughfare,
+                number = addresses?.first()?.subThoroughfare
+            )
+        )
     }
 
     private fun hasToGrantPermission(): Boolean {

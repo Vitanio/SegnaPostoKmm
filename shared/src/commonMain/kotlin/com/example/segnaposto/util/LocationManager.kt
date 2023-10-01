@@ -42,5 +42,12 @@ sealed class LocationPowerStatus {
 
 data class LocationCoordinates(
     var latitude: Double,
-    var longitude: Double
-)
+    var longitude: Double,
+    val locationInfo: LocationInfo? = null
+){
+    data class LocationInfo(
+        val locality: String?,
+        val address: String?,
+        val number: String?
+    )
+}
