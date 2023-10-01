@@ -107,4 +107,9 @@ actual class LocationManager(private val context: Context) {
     }
 
 
+    actual fun stopUpdatingLocation(){
+        // ios specific, nothing to do here
+    }
+
+
 }

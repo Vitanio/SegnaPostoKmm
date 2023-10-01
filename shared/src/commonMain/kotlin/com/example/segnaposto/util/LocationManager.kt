@@ -11,6 +11,8 @@ expect class LocationManager {
 
     fun getLocationCoordinates(onResultListener: (LocationCoordinates?) -> Unit)
 
+    fun stopUpdatingLocation()
+
     /* directly request the permission */
     fun requestPermission(event: (ParkScreenEvent) -> Unit)
 

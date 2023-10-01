@@ -103,6 +103,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
                 }
 
                 PermissionStatus.Granted -> {
+
                     when (locationPowerStatus) {
                         LocationPowerStatus.On -> {
                             insertPark()
@@ -121,8 +122,11 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
 
     private fun insertPark() {
 
-        val locationCoordinates = locationManager.getLocationCoordinates { location ->
+        // TODO: Show spinner
+        
+        locationManager.getLocationCoordinates { location ->
             viewModelScope.launch {
+                locationManager.stopUpdatingLocation()
                 if (location != null) {
                     repository.insertPark(parkBuilder(location))
 

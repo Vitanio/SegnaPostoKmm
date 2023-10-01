@@ -8,14 +8,14 @@ struct ContentView: View {
     
     let databaseModule: DatabaseModule
     let repository: ParkRepository
-    let permissionsUtil: PermissionsUtil
+    let locationManager: LocationManager
     let viewModel:ParkViewModel
     
     init() {
         self.databaseModule = DatabaseModule()
         self.repository = ParkRepository(driver: databaseModule.driver)
-        self.permissionsUtil = PermissionsUtil()
-        self.viewModel = ParkViewModel(repository: repository, permissionsUtil: permissionsUtil)
+        self.locationManager = LocationManager()
+        self.viewModel = ParkViewModel(repository: repository, locationManager: locationManager)
     }
         
     var body: some View {
