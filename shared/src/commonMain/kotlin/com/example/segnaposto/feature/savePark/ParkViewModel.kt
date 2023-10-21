@@ -45,7 +45,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             }
 
             is ParkEvent.OnDeleteParkClicked -> {
-                _parkState.update { it.copy(test = "Delete park clicked") }
+                handleOnDeletePark()
             }
 
         }
@@ -68,6 +68,10 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
     }
 
     private fun handleOnGoToSettings() {
+        locationManager.openAppSettings()
+    }
+
+    private fun handleOnDeletePark() {
         locationManager.openAppSettings()
     }
 
@@ -106,7 +110,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
 
                     when (locationPowerStatus) {
                         LocationPowerStatus.On -> {
-                            insertPark()
+                            handleInsertParkOperations()
                         }
 
                         LocationPowerStatus.Off -> {
@@ -120,7 +124,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
         }
     }
 
-    private fun insertPark() {
+    private fun handleInsertParkOperations() {
 
         // TODO: Show spinner
 
@@ -128,13 +132,39 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             viewModelScope.launch {
                 locationManager.stopUpdatingLocation()
                 if (location != null) {
-                    repository.insertPark(parkBuilder(location))
 
-                    _parkState.update { state ->
-                        state.copy(parkHistory = repository.getParkHistory())
-                    }
+                    insertPark(location)
+                    addInfoFromCoordinates(location)
+
                 }else{
                     // TODO: Show alert
+                }
+            }
+        }
+    }
+
+    private suspend fun insertPark(location: LocationCoordinates) {
+        repository.insertPark(id = null, park = parkBuilder(location))
+
+        _parkState.update { state ->
+            state.copy(parkHistory = repository.getParkHistory())
+        }
+    }
+
+    private fun addInfoFromCoordinates(location: LocationCoordinates) {
+        locationManager.getInfoFromCoordinates(
+            latitude = location.latitude,
+            longitude = location.longitude
+        ) { updatedLocation ->
+            viewModelScope.launch {
+                repository.insertPark(
+                    id = repository.getLatestPark().id.toLong(), parkBuilder(
+                        locationCoordinates = updatedLocation
+                    )
+                )
+
+                _parkState.update { state ->
+                    state.copy(parkHistory = repository.getParkHistory())
                 }
             }
         }

@@ -8,9 +8,9 @@ class SqlDelightParkDataSource(db: ParkDatabase): ParkDataSource {
 
     private val queries = db.parkQueries
 
-    override suspend fun insertPark(park: Park) {
+    override suspend fun insertPark(id: Long?, park: Park) {
         queries.insertPark(
-            id = null,
+            id = id,
             title = park.title,
             description = park.description,
             latitude = park.latitude,

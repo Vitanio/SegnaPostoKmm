@@ -79,7 +79,7 @@ actual class LocationManager(private val context: Context) {
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    locationCoordinates = addLocationExtraInfoIfPresent(
+                    locationCoordinates = LocationCoordinates(
                         latitude = location.latitude,
                         longitude = location.longitude
                     )
@@ -89,18 +89,20 @@ actual class LocationManager(private val context: Context) {
         }
     }
 
-    private fun addLocationExtraInfoIfPresent(latitude: Double, longitude: Double): LocationCoordinates {
+    actual fun getInfoFromCoordinates(latitude: Double, longitude: Double, result: (LocationCoordinates) -> Unit) {
         // TODO: Need to be done async android
         val geocoder = Geocoder(context, Locale.getDefault())
         val addresses = geocoder.getFromLocation(latitude, longitude, 1)
 
-        return LocationCoordinates(
-            latitude = latitude,
-            longitude = longitude,
-            locationInfo = LocationCoordinates.LocationInfo(
-                locality = addresses?.first()?.locality,
-                address = addresses?.first()?.thoroughfare,
-                number = addresses?.first()?.subThoroughfare
+        result.invoke(
+            LocationCoordinates(
+                latitude = latitude,
+                longitude = longitude,
+                locationInfo = LocationCoordinates.LocationInfo(
+                    locality = addresses?.first()?.locality,
+                    address = addresses?.first()?.thoroughfare,
+                    number = addresses?.first()?.subThoroughfare
+                )
             )
         )
     }

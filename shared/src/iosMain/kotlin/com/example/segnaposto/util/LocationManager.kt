@@ -68,6 +68,32 @@ actual class LocationManager {
         locationManager.startUpdatingLocation()
     }
 
+    actual fun getInfoFromCoordinates(
+        latitude: Double,
+        longitude: Double,
+        result: (LocationCoordinates) -> Unit
+    ) {
+
+        val location = CLLocation(latitude = latitude, longitude = longitude)
+        val geocoder = CLGeocoder()
+
+        geocoder.reverseGeocodeLocation(location = location, completionHandler = { placeMarks, _ ->
+            val placeMark = placeMarks?.firstOrNull() as? CLPlacemark
+
+            result.invoke(
+                LocationCoordinates(
+                    latitude = latitude,
+                    longitude = longitude,
+                    locationInfo = LocationCoordinates.LocationInfo(
+                        locality = placeMark?.locality ?: "",
+                        address = placeMark?.administrativeArea,
+                        number = placeMark?.country ?: ""
+                    )
+                )
+            )
+        })
+    }
+
     actual fun stopUpdatingLocation() = locationManager.stopUpdatingLocation()
 
 }
@@ -95,39 +121,6 @@ class CLLocationManagerDelegate(private val onResultListener: (LocationCoordinat
 
             else -> onResultListener.invoke(null)
         }
-    }
-
-    private fun addLocationExtraInfoIfPresent(
-        location: CLLocation,
-        latitude: Double,
-        longitude: Double
-    ): LocationCoordinates {
-
-        // TODO: Need to be done async ios
-        val geocoder = CLGeocoder()
-
-        geocoder.reverseGeocodeLocation(location = location, completionHandler = { placemarks, _ ->
-            val placemark = placemarks?.firstOrNull() as? CLPlacemark
-
-            LocationCoordinates(
-                latitude = latitude,
-                longitude = longitude,
-                locationInfo = LocationCoordinates.LocationInfo(
-                    locality = placemark?.locality ?: "",
-                    address = placemark?.administrativeArea,
-                    number = placemark?.country ?: ""
-                )
-            )
-        })
-        return LocationCoordinates(
-            latitude = latitude,
-            longitude = longitude,
-            locationInfo = LocationCoordinates.LocationInfo(
-                locality = "",
-                address = " ",
-                number = ""
-            )
-        )
     }
 }
 

@@ -16,6 +16,8 @@ expect class LocationManager {
     /* directly request the permission */
     fun requestPermission(event: (ParkScreenEvent) -> Unit)
 
+    fun getInfoFromCoordinates(latitude: Double, longitude: Double, result: (LocationCoordinates) -> Unit)
+
     fun openAppSettings()
 }
 

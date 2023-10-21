@@ -69,6 +69,8 @@ struct ParkScreen: View {
     
     var body: some View {
         
+        let columns = [GridItem(.flexible()), GridItem(.flexible())]
+        
         if(self.uiElements.value.showPermissionDialog){
             PermissionDialog(
                 title: "Access location?",
@@ -77,57 +79,120 @@ struct ParkScreen: View {
                     viewModel.onEvent(event: ParkEvent.OnGoToSettingsClicked())
                     self.uiElements.value = UiElement(requestPermission: false, showPermissionDialog: false)
                 }
+                .navigationTitle("Segna Posto")
         }else{
-            Button("Add Park Button") { viewModel.onEvent(event: ParkEvent.OnAddParkClicked()) }
-            List(self.state.value.parkHistory, id: \.self) { element in
-                CardView(element: element)
-            }
-            .listRowBackground(Color.clear)
-            .onAppear {
-                if !isViewAppeared {
-                    viewModel.onEvent(event: ParkEvent.OnScreenResumed())
-                    isViewAppeared = true
-                }
-            }
-            .onDisappear {
-                // Handle the ON_STOP event here if needed
-            }
-        }
-            
-        }
-    }
-    
-    extension ParkViewModel {
-        
-        func observableState() -> ObservableParkState {
-            return (parkState.value as! ParkState).wrapAsObservable()
-        }
-    }
-    
-    struct CardView: View {
-        let element: Park
-        
-        var body: some View {
-            
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text("Id: \(element.id)")
-                    Spacer()
-                    Text("Title: \(element.title)")
+            ScrollView{
+                
+                if(self.state.value.parkHistory.first != nil){
+                    PrimaryCardView(element: self.state.value.parkHistory.first!)
                 }
                 
-                HStack {
-                    Text("Latitude: \(element.latitude)")
-                    Spacer()
-                    Text("Longitude: \(element.longitude)")
+            
+                LazyVGrid(
+                    columns: columns,
+                    alignment: .leading,
+                    spacing: 10
+                ) {
+                    ForEach(
+                        self.state.value.parkHistory,
+                        id: \.self
+                    ) { element in
+                        SecondaryCardView(element: element)
+                    }
+                    .frame(width: UIScreen.screenWidth / 2, height: 100, alignment: .leading)
                 }
             }
-            .padding(10)
-            .background(Color.white)
-            .cornerRadius(10)
-            .shadow(radius: 5)
-            .padding([.leading, .trailing], 10)
-            .padding(.top, 5)
-        }
-    }
 
+            
+            Button("Add Park Button") { viewModel.onEvent(event: ParkEvent.OnAddParkClicked()) }
+            
+                .listRowBackground(Color.clear)
+                .onAppear {
+                    if !isViewAppeared {
+                        viewModel.onEvent(event: ParkEvent.OnScreenResumed())
+                        isViewAppeared = true
+                    }
+                }
+                .onDisappear {
+                    // Handle the ON_STOP event here if needed
+                }
+                .navigationTitle("Segna Posto")
+        }
+        
+        
+    }
+    
+}
+
+extension ParkViewModel {
+    
+    func observableState() -> ObservableParkState {
+        return (parkState.value as! ParkState).wrapAsObservable()
+    }
+}
+
+struct PrimaryCardView: View {
+    let element: Park
+    
+    var body: some View {
+        
+        
+        VStack(alignment: .leading, spacing: 10) {
+            
+            HStack {
+                Text("Id: \(element.id)")
+                Spacer()
+                Text("Title: \(element.title)")
+            }
+            
+            HStack {
+                Text("Latitude: \(element.latitude)")
+                Spacer()
+                Text("Longitude: \(element.longitude)")
+            }
+        }
+        .padding(10)
+        .background(Color.blue)
+        .cornerRadius(10)
+        .padding([.leading, .trailing], 10)
+        .padding(.top, 5)
+    
+    }
+}
+
+struct SecondaryCardView: View {
+    let element: Park
+    
+    var body: some View {
+        
+        
+        VStack(alignment: .leading, spacing: 10) {
+            
+            HStack {
+                Text("Id: \(element.id)")
+                Spacer()
+                Text("Title: \(element.title)")
+            }
+            
+            HStack {
+                Text("Latitude: \(element.latitude)")
+                Spacer()
+                Text("Longitude: \(element.longitude)")
+            }
+        }
+        .padding(10)
+        .background(Color.blue)
+        .cornerRadius(10)
+        .padding([.leading, .trailing], 10)
+        .padding(.top, 5)
+        
+    
+    }
+}
+
+
+extension UIScreen{
+   static let screenWidth = UIScreen.main.bounds.size.width
+   static let screenHeight = UIScreen.main.bounds.size.height
+   static let screenSize = UIScreen.main.bounds.size
+}
