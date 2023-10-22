@@ -84,25 +84,25 @@ struct ParkScreen: View {
             ScrollView{
                 
                 if(self.state.value.parkHistory.first != nil){
-                    PrimaryCardView(element: self.state.value.parkHistory.first!)
+                    PrimaryCardView(element: self.state.value.parkHistory.first!) { viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: self.state.value.parkHistory.first!))
+                    }
                 }
                 
-            
                 LazyVGrid(
                     columns: columns,
-                    alignment: .leading,
+                    alignment: .center,
                     spacing: 10
                 ) {
                     ForEach(
                         self.state.value.parkHistory,
                         id: \.self
                     ) { element in
-                        SecondaryCardView(element: element)
+                        SecondaryCardView(element: element) { viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element)) }
                     }
-                    .frame(width: UIScreen.screenWidth / 2, height: 100, alignment: .leading)
+                    //.frame(width: (UIScreen.screenWidth) / 2, height: 150, alignment: .leading)
                 }
             }
-
+            
             
             Button("Add Park Button") { viewModel.onEvent(event: ParkEvent.OnAddParkClicked()) }
             
@@ -133,66 +133,96 @@ extension ParkViewModel {
 
 struct PrimaryCardView: View {
     let element: Park
+    let deleteFunction: () -> Void
     
     var body: some View {
         
-        
         VStack(alignment: .leading, spacing: 10) {
-            
-            HStack {
-                Text("Id: \(element.id)")
-                Spacer()
-                Text("Title: \(element.title)")
+            HStack{
+                Image(uiImage: UIImage(named: "MapsIcon")!).resizable().scaledToFit().frame(width: 50, height: 50)
+                VStack(alignment: .leading, spacing: 10){
+                    Text(element.title)
+                    if(element.description_ != nil){
+                        Text(element.description_!)
+                    }
+                }
             }
+
             
-            HStack {
+            VStack(alignment: .leading, spacing: 10) {
                 Text("Latitude: \(element.latitude)")
-                Spacer()
                 Text("Longitude: \(element.longitude)")
             }
+            
+            Text("Id: \(element.id)")
+            
+            Button(action: { deleteFunction() }, label: {
+                Text("Delete")
+                    .padding(10)
+                    .background(Color.black)
+                    .foregroundColor(.white)
+            }).cornerRadius(20)
+            
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
         .background(Color.blue)
         .cornerRadius(10)
         .padding([.leading, .trailing], 10)
         .padding(.top, 5)
-    
+        
     }
 }
 
 struct SecondaryCardView: View {
     let element: Park
+    let deleteFunction: () -> Void
     
     var body: some View {
         
         
         VStack(alignment: .leading, spacing: 10) {
             
-            HStack {
-                Text("Id: \(element.id)")
-                Spacer()
-                Text("Title: \(element.title)")
+            HStack{
+                Image(uiImage: UIImage(named: "MapsIcon")!).resizable().scaledToFit().frame(width: 50, height: 50)
+                VStack(alignment: .leading, spacing: 10){
+                    Text(element.title)
+                    if(element.description_ != nil){
+                        Text(element.description_!)
+                    }
+                }
             }
             
-            HStack {
+            VStack(alignment: .leading, spacing: 10) {
                 Text("Latitude: \(element.latitude)")
-                Spacer()
                 Text("Longitude: \(element.longitude)")
             }
+            
+            
+            Text("Id: \(element.id)")
+            
+            
+            Button(action: { deleteFunction() }, label: {
+                Text("Delete")
+                    .padding(10)
+                    .background(Color.black)
+                    .foregroundColor(.white)
+            }).cornerRadius(20)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
         .background(Color.blue)
         .cornerRadius(10)
         .padding([.leading, .trailing], 10)
         .padding(.top, 5)
         
-    
+        
     }
 }
 
 
 extension UIScreen{
-   static let screenWidth = UIScreen.main.bounds.size.width
-   static let screenHeight = UIScreen.main.bounds.size.height
-   static let screenSize = UIScreen.main.bounds.size
+    static let screenWidth = UIScreen.main.bounds.size.width
+    static let screenHeight = UIScreen.main.bounds.size.height
+    static let screenSize = UIScreen.main.bounds.size
 }

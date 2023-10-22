@@ -45,13 +45,11 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             }
 
             is ParkEvent.OnDeleteParkClicked -> {
-                handleOnDeletePark()
+                handleOnDeletePark(event.park)
             }
 
         }
     }
-
-    private fun isGpsActive(): Boolean = true
 
     private fun sendUiEvent(event: ParkScreenEvent) {
         viewModelScope.launch {
@@ -62,7 +60,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
     private fun handleOnScreenResumed() {
         viewModelScope.launch {
             _parkState.update { state ->
-                state.copy(parkHistory = repository.getParkHistory())
+                state.copy(parkHistory = repository.getParkHistory().asReversed())
             }
         }
     }
@@ -71,8 +69,14 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
         locationManager.openAppSettings()
     }
 
-    private fun handleOnDeletePark() {
-        locationManager.openAppSettings()
+    private fun handleOnDeletePark(parkClicked: Park) {
+        viewModelScope.launch {
+            repository.deleteParkById(parkClicked.id.toLong())
+
+            _parkState.update { state ->
+                state.copy(parkHistory = repository.getParkHistory().asReversed())
+            }
+        }
     }
 
     private fun handleOnAddPark() {
@@ -147,7 +151,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
         repository.insertPark(id = null, park = parkBuilder(location))
 
         _parkState.update { state ->
-            state.copy(parkHistory = repository.getParkHistory())
+            state.copy(parkHistory = repository.getParkHistory().asReversed())
         }
     }
 
@@ -164,7 +168,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
                 )
 
                 _parkState.update { state ->
-                    state.copy(parkHistory = repository.getParkHistory())
+                    state.copy(parkHistory = repository.getParkHistory().asReversed())
                 }
             }
         }
