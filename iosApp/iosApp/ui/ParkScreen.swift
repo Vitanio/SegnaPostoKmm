@@ -8,6 +8,8 @@
 
 import SwiftUI
 import shared
+import MapKit
+import CoreLocation
 
 struct ParkScreen: View {
     @ObservedObject private var state: ObservableParkState
@@ -69,7 +71,9 @@ struct ParkScreen: View {
     
     var body: some View {
         
-        let columns = [GridItem(.flexible()), GridItem(.flexible())]
+        if(self.state.value.parkHistory.first != nil){
+            MapCardView(element: self.state.value.parkHistory.first!)}
+        
         
         if(self.uiElements.value.showPermissionDialog){
             PermissionDialog(
@@ -82,22 +86,12 @@ struct ParkScreen: View {
                 .navigationTitle("Segna Posto")
         }else{
             ScrollView{
-                
-                if(self.state.value.parkHistory.first != nil){
-                    PrimaryCardView(element: self.state.value.parkHistory.first!) { viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: self.state.value.parkHistory.first!))
-                    }
-                }
-                
-                LazyVGrid(
-                    columns: columns,
-                    alignment: .center,
-                    spacing: 10
-                ) {
+                VStack {
                     ForEach(
                         self.state.value.parkHistory,
                         id: \.self
                     ) { element in
-                        SecondaryCardView(element: element) { viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element)) }
+                        ParkCardView(element: element) { viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element)) }
                     }
                     //.frame(width: (UIScreen.screenWidth) / 2, height: 150, alignment: .leading)
                 }
@@ -119,7 +113,6 @@ struct ParkScreen: View {
                 .navigationTitle("Segna Posto")
         }
         
-        
     }
     
 }
@@ -131,15 +124,17 @@ extension ParkViewModel {
     }
 }
 
-struct PrimaryCardView: View {
+struct ParkCardView: View {
     let element: Park
     let deleteFunction: () -> Void
     
+    @available(iOS 17.0, *)
     var body: some View {
-        
+        var parkMarker = CLLocationCoordinate2D(latitude: element.latitude, longitude: element.longitude)
         VStack(alignment: .leading, spacing: 10) {
             HStack{
-                Image(uiImage: UIImage(named: "MapsIcon")!).resizable().scaledToFit().frame(width: 50, height: 50)
+                Image(uiImage: UIImage(named: "MapsIcon")!).resizable().scaledToFit().frame(width: 50, height: 50).onTapGesture {
+                }
                 VStack(alignment: .leading, spacing: 10){
                     Text(element.title)
                     if(element.description_ != nil){
@@ -172,54 +167,20 @@ struct PrimaryCardView: View {
         .padding(.top, 5)
         
     }
+    
 }
 
-struct SecondaryCardView: View {
+struct MapCardView: View {
     let element: Park
-    let deleteFunction: () -> Void
     
+    @available(iOS 17.0, *)
     var body: some View {
-        
-        
-        VStack(alignment: .leading, spacing: 10) {
-            
-            HStack{
-                Image(uiImage: UIImage(named: "MapsIcon")!).resizable().scaledToFit().frame(width: 50, height: 50)
-                VStack(alignment: .leading, spacing: 10){
-                    Text(element.title)
-                    if(element.description_ != nil){
-                        Text(element.description_!)
-                    }
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Latitude: \(element.latitude)")
-                Text("Longitude: \(element.longitude)")
-            }
-            
-            
-            Text("Id: \(element.id)")
-            
-            
-            Button(action: { deleteFunction() }, label: {
-                Text("Delete")
-                    .padding(10)
-                    .background(Color.black)
-                    .foregroundColor(.white)
-            }).cornerRadius(20)
+        var parkMarker = CLLocationCoordinate2D(latitude: element.latitude, longitude: element.longitude)
+        Map {
+            Marker("Tower Bridge", coordinate: parkMarker)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(Color.blue)
-        .cornerRadius(10)
-        .padding([.leading, .trailing], 10)
-        .padding(.top, 5)
-        
-        
     }
 }
-
 
 extension UIScreen{
     static let screenWidth = UIScreen.main.bounds.size.width
