@@ -73,10 +73,6 @@ struct ParkScreen: View {
     
     var body: some View {
         
-        if(self.state.value.parkHistory.first != nil){
-            MapCardView(element: self.state.value.parkHistory.first!)}
-        
-        
         if(self.uiElements.value.showPermissionDialog){
             PermissionDialog(
                 title: "Access location?",
@@ -93,15 +89,12 @@ struct ParkScreen: View {
                         self.state.value.parkHistory,
                         id: \.self
                     ) { element in
-                        
-                        ParkCardView(
-                            element: element,
-                            openMapFunction: {
-                                viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element))
-                        },
+
+                        MapCardView(element: element,
                         deleteFunction: {
                             viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element))
-                        })
+                        })}
+
                     }
                     //.frame(width: (UIScreen.screenWidth) / 2, height: 150, alignment: .leading)
                 }
@@ -121,11 +114,12 @@ struct ParkScreen: View {
                     // Handle the ON_STOP event here if needed
                 }
                 .navigationTitle("Segna Posto")
+
         }
         
     }
-    
-}
+
+
 
 extension ParkViewModel {
     
@@ -182,30 +176,53 @@ struct ParkCardView: View {
 
 struct MapCardView: View {
     let element: Park
-    
+    let deleteFunction: () -> Void
+
     var body: some View {
         var parkMarker = CLLocationCoordinate2D(latitude: element.latitude, longitude: element.longitude)
         
-        VStack(alignment: .leading, spacing: 10) {
-            if #available(iOS 17.0, *) {
-                Map {
-                    Marker("Tower Bridge", coordinate: parkMarker)
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                if #available(iOS 17.0, *) {
+                    Map {
+                        Marker("Tower Bridge", coordinate: parkMarker)
+                    }
+                } else {
+                    Map(coordinateRegion: .constant(
+                        MKCoordinateRegion(
+                            center: parkMarker,
+                            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                        )
+                    ))
                 }
-            } else {
-                Map(coordinateRegion: .constant(
-                    MKCoordinateRegion(
-                        center: parkMarker,
-                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                    )
-                ))
             }
+            .frame(maxWidth: .infinity, minHeight: 250, alignment: .leading)
+            .cornerRadius(20)
+
+            VStack(alignment: .leading) {
+                Text(element.title)
+                if(element.description_ != nil){
+                    Text(element.description_!)
+                }
+                Text("Latitude: \(element.latitude)")
+                Text("Longitude: \(element.longitude)")
+                Text("Id: \(element.id)")
+                Button(action: { deleteFunction() }, label: {
+                    Text("Delete")
+                        .padding(10)
+                        .background(Color.black)
+                        .foregroundColor(.white)
+                }).cornerRadius(20)
+            }
+            .padding([.leading, .trailing, .bottom], 10)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.blue)
-        .cornerRadius(10)
+        .background(Color.teal)
+        .cornerRadius(20)
         .padding([.leading, .trailing], 10)
-        .padding(.top, 5)
+        
     }
+    
 }
 
 extension UIScreen{
