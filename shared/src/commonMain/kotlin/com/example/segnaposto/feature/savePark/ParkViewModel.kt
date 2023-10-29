@@ -37,6 +37,9 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             is ParkEvent.OnGoToSettingsClicked -> {
                 handleOnGoToSettings()
             }
+            is ParkEvent.OnStartNavigationClicked -> {
+                handleOnStartNavigation(event.park)
+            }
             is ParkEvent.OnParkClicked -> {
                 _parkState.update { it.copy(test = "Park clicked") }
             }
@@ -65,6 +68,10 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
 
     private fun handleOnGoToSettings() {
         locationManager.openAppSettings()
+    }
+
+    private fun handleOnStartNavigation(park: Park) {
+        locationManager.openMapsForNavigation(park)
     }
 
     private fun handleOnDeletePark(parkClicked: Park) {
@@ -191,6 +198,7 @@ sealed class ParkEvent {
     object OnScreenResumed : ParkEvent()
     object OnAddParkClicked : ParkEvent()
     object OnGoToSettingsClicked : ParkEvent()
+    data class OnStartNavigationClicked(val park: Park) : ParkEvent()
     data class OnParkClicked(val park: Park) : ParkEvent()
     data class OnDeleteParkClicked(val park: Park) : ParkEvent()
     data class OnShowMapClicked(val park: Park) : ParkEvent()

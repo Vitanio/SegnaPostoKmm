@@ -91,6 +91,9 @@ struct ParkScreen: View {
                     ) { element in
 
                         ParkCardView(element: element,
+                                     navigationFunction: {
+                            viewModel.onEvent(event: ParkEvent.OnStartNavigationClicked(park: element))
+                        },
                         deleteFunction: {
                             viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element))
                         })}
@@ -130,6 +133,7 @@ extension ParkViewModel {
 
 struct ParkCardView: View {
     let element: Park
+    let navigationFunction: () -> Void
     let deleteFunction: () -> Void
 
     var body: some View {
@@ -145,8 +149,7 @@ struct ParkCardView: View {
                     Map(coordinateRegion: .constant(
                         MKCoordinateRegion(
                             center: parkMarker,
-                            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                        )
+                            latitudinalMeters: CLLocationDistance(exactly: 200)!, longitudinalMeters: CLLocationDistance(exactly: 200)!)
                     ))
                 }
             }
@@ -160,26 +163,22 @@ struct ParkCardView: View {
                         Text(element.description_! + " - " + element.number!)
                         
                     }.frame(maxWidth: .infinity, alignment: .leading)
-                    Circle()
-                        .fill(Color(UIColor.white))
-                        .overlay(
-                            Image(systemName: "ellipsis")
-                                .frame(width: 30, height: 30, alignment: .center)
-                                .foregroundColor(Color(UIColor.systemGray5))
-                                .onTapGesture(perform: {deleteFunction()})
-                        )
-                        .frame(width: 30, height: 30, alignment: .trailing)
-                    
+                        Image(systemName: "minus.circle.fill")
+                            .resizable()
+                            .frame(width: 30, height: 30, alignment: .trailing)
+                            .foregroundColor(Color(UIColor.systemRed))
+                            .onTapGesture(perform: {deleteFunction()})
+                            
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Button(action: { deleteFunction() }, label: {
+                Button(action: { navigationFunction() }, label: {
                     Text("Navigate")
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(10)
                         .background(Color(UIColor.systemTeal))
                         .foregroundColor(.white)
-                        .font(.system(size: 16, weight: .bold, design: .default))
+                        .font(.system(size: 18, weight: .semibold, design: .default))
                         
                 }).cornerRadius(10)
             }

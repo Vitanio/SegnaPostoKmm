@@ -1,5 +1,6 @@
 package com.example.segnaposto.util
 
+import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
@@ -16,6 +17,10 @@ import platform.UIKit.UIApplicationOpenSettingsURLString
 import platform.darwin.NSObject
 
 actual class LocationManager {
+
+    companion object{
+        const val UIApplicationOpenGoogleMapsURLString = "comgooglemaps://"
+    }
 
     private val locationManager = CLLocationManager().apply {
         desiredAccuracy = kCLLocationAccuracyBestForNavigation
@@ -96,7 +101,18 @@ actual class LocationManager {
     }
 
     actual fun stopUpdatingLocation() = locationManager.stopUpdatingLocation()
+    actual fun openMapsForNavigation(park: Park) {
 
+        val url = NSURL(string = UIApplicationOpenGoogleMapsURLString)
+
+        if (UIApplication.sharedApplication().canOpenURL(url))
+            UIApplication.sharedApplication.openURL(
+                NSURL(
+                    string = UIApplicationOpenGoogleMapsURLString +
+                            "?saddr=&daddr=${park.latitude},${park.longitude}&directionsmode=walking"
+                )
+            )
+    }
 }
 
 class CLLocationManagerDelegate(private val onResultListener: (LocationCoordinates?) -> Unit) :

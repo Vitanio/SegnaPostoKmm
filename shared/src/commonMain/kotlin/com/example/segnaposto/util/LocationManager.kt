@@ -1,5 +1,6 @@
 package com.example.segnaposto.util
 
+import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 
 
@@ -18,6 +19,7 @@ expect class LocationManager {
 
     fun getInfoFromCoordinates(latitude: Double, longitude: Double, result: (LocationCoordinates) -> Unit)
 
+    fun openMapsForNavigation(park: Park)
     fun openAppSettings()
 }
 

@@ -14,6 +14,7 @@ import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.segnaposto.feature.savePark.ParkEvent
+import com.example.segnaposto.feature.savePark.model.Park
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
 
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -130,6 +131,9 @@ actual class LocationManager(private val context: Context) {
 
     actual fun stopUpdatingLocation(){
         // ios specific, nothing to do here
+    }
+
+    actual fun openMapsForNavigation(park: Park) {
     }
 
 
