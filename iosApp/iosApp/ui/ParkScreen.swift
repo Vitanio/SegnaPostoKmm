@@ -165,7 +165,7 @@ struct ParkCardView: View {
                     }.frame(maxWidth: .infinity, alignment: .leading)
                         Image(systemName: "minus.circle.fill")
                             .resizable()
-                            .frame(width: 30, height: 30, alignment: .trailing)
+                            .frame(width: 20, height: 20, alignment: .trailing)
                             .foregroundColor(Color(UIColor.systemRed))
                             .onTapGesture(perform: {deleteFunction()})
                             
@@ -188,6 +188,7 @@ struct ParkCardView: View {
         .background(Color(UIColor.systemGray5))
         .cornerRadius(20)
         .padding([.leading, .trailing], 10)
+        .padding([.top, .bottom], 10)
         
     }
     
