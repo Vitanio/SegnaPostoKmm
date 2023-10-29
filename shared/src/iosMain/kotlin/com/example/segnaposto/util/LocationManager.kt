@@ -87,8 +87,8 @@ actual class LocationManager {
                     longitude = longitude,
                     locationInfo = LocationCoordinates.LocationInfo(
                         locality = placeMark?.locality ?: "",
-                        address = placeMark?.administrativeArea,
-                        number = placeMark?.country ?: ""
+                        address = placeMark?.thoroughfare,
+                        number = placeMark?.subThoroughfare ?: ""
                     )
                 )
             )

@@ -23,10 +23,11 @@ INTO parkEntity(
     id,
     title,
     description,
+    number,
     latitude,
     longitude,
     date
-) VALUES(?, ?,  ?, ?,?, ?);
+) VALUES(?, ?, ?, ?,?,?, ?);
 
 deleteParkById:
 DELETE FROM parkEntity

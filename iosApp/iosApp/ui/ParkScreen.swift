@@ -90,7 +90,7 @@ struct ParkScreen: View {
                         id: \.self
                     ) { element in
 
-                        MapCardView(element: element,
+                        ParkCardView(element: element,
                         deleteFunction: {
                             viewModel.onEvent(event: ParkEvent.OnDeleteParkClicked(park: element))
                         })}
@@ -130,52 +130,6 @@ extension ParkViewModel {
 
 struct ParkCardView: View {
     let element: Park
-    let openMapFunction: () -> Void
-    let deleteFunction: () -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack{
-                Image(uiImage: UIImage(named: "MapsIcon")!).resizable().scaledToFit().frame(width: 50, height: 50).onTapGesture {
-                        openMapFunction()
-                }
-                VStack(alignment: .leading, spacing: 10){
-                    Text(element.title)
-                    if(element.description_ != nil){
-                        Text(element.description_!)
-                    }
-                }
-            }
-
-            
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Latitude: \(element.latitude)")
-                Text("Longitude: \(element.longitude)")
-            }
-            
-            Text("Id: \(element.id)")
-            
-            Button(action: { deleteFunction() }, label: {
-                Text("Delete")
-                    .padding(10)
-                    .background(Color.black)
-                    .foregroundColor(.white)
-            }).cornerRadius(20)
-            
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(Color.blue)
-        .cornerRadius(10)
-        .padding([.leading, .trailing], 10)
-        .padding(.top, 5)
-        
-    }
-    
-}
-
-struct MapCardView: View {
-    let element: Park
     let deleteFunction: () -> Void
 
     var body: some View {
@@ -200,24 +154,39 @@ struct MapCardView: View {
             .cornerRadius(20)
 
             VStack(alignment: .leading) {
-                Text(element.title)
-                if(element.description_ != nil){
-                    Text(element.description_!)
+                HStack{
+                    VStack(alignment: .leading) {
+                        Text(element.title)
+                        Text(element.description_! + " - " + element.number!)
+                        
+                    }.frame(maxWidth: .infinity, alignment: .leading)
+                    Circle()
+                        .fill(Color(UIColor.white))
+                        .overlay(
+                            Image(systemName: "ellipsis")
+                                .frame(width: 30, height: 30, alignment: .center)
+                                .foregroundColor(Color(UIColor.systemGray5))
+                                .onTapGesture(perform: {deleteFunction()})
+                        )
+                        .frame(width: 30, height: 30, alignment: .trailing)
+                    
                 }
-                Text("Latitude: \(element.latitude)")
-                Text("Longitude: \(element.longitude)")
-                Text("Id: \(element.id)")
+                .frame(maxWidth: .infinity, alignment: .leading)
+
                 Button(action: { deleteFunction() }, label: {
-                    Text("Delete")
+                    Text("Navigate")
+                        .frame(maxWidth: .infinity, alignment: .center)
                         .padding(10)
-                        .background(Color.black)
+                        .background(Color(UIColor.systemTeal))
                         .foregroundColor(.white)
-                }).cornerRadius(20)
+                        .font(.system(size: 16, weight: .bold, design: .default))
+                        
+                }).cornerRadius(10)
             }
             .padding([.leading, .trailing, .bottom], 10)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.teal)
+        .background(Color(UIColor.systemGray5))
         .cornerRadius(20)
         .padding([.leading, .trailing], 10)
         

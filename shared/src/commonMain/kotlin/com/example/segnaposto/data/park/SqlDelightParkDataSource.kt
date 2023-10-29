@@ -13,6 +13,7 @@ class SqlDelightParkDataSource(db: ParkDatabase): ParkDataSource {
             id = id,
             title = park.title,
             description = park.description,
+            number = park.number,
             latitude = park.latitude,
             longitude = park.longitude,
             date = park.date

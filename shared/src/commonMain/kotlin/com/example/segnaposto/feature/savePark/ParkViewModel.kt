@@ -179,6 +179,7 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
         return Park(
             title = locationCoordinates.locationInfo?.locality?:"N/A",
             description = locationCoordinates.locationInfo?.address?:"N/A",
+            number = locationCoordinates.locationInfo?.number?:"N/A",
             latitude = locationCoordinates.latitude,
             longitude = locationCoordinates.longitude,
             date = "Domenica"
