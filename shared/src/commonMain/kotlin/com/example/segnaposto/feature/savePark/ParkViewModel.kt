@@ -31,23 +31,21 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
             is ParkEvent.OnScreenResumed -> {
                 handleOnScreenResumed()
             }
-
             is ParkEvent.OnAddParkClicked -> {
                 handleOnAddPark()
             }
-
             is ParkEvent.OnGoToSettingsClicked -> {
                 handleOnGoToSettings()
             }
-
             is ParkEvent.OnParkClicked -> {
                 _parkState.update { it.copy(test = "Park clicked") }
             }
-
             is ParkEvent.OnDeleteParkClicked -> {
                 handleOnDeletePark(event.park)
             }
-
+            is ParkEvent.OnShowMapClicked -> {
+                handleOnShowMapClicked(event.park)
+            }
         }
     }
 
@@ -79,6 +77,12 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
         }
     }
 
+    private fun handleOnShowMapClicked(parkClicked: Park) {
+        viewModelScope.launch {
+            sendUiEvent(ParkScreenEvent.ShowMapDialog(park = parkClicked))
+        }
+    }
+
     private fun handleOnAddPark() {
         viewModelScope.launch {
 
@@ -91,7 +95,6 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
                         sendUiEvent(ParkScreenEvent.RequestPermission)
                     }
                 }
-
                 PermissionStatus.Denied -> {
                     sendUiEvent(
                         ParkScreenEvent.ShowPermissionDialog(
@@ -100,7 +103,6 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
                         )
                     )
                 }
-
                 PermissionStatus.AndroidDontAskAgain -> {
                     sendUiEvent(
                         ParkScreenEvent.ShowPermissionDialog(
@@ -109,7 +111,6 @@ class ParkViewModel(val repository: ParkRepository, val locationManager: Locatio
                         )
                     )
                 }
-
                 PermissionStatus.Granted -> {
 
                     when (locationPowerStatus) {
@@ -191,4 +192,5 @@ sealed class ParkEvent {
     object OnGoToSettingsClicked : ParkEvent()
     data class OnParkClicked(val park: Park) : ParkEvent()
     data class OnDeleteParkClicked(val park: Park) : ParkEvent()
+    data class OnShowMapClicked(val park: Park) : ParkEvent()
 }

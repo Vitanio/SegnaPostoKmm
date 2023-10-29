@@ -22,6 +22,7 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
+            binaryOption("bundleId", "com.example.segnaposto.shared")
         }
     }
 

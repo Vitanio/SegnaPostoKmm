@@ -1,6 +1,7 @@
 package com.example.segnaposto.util
 
 import com.example.segnaposto.feature.savePark.model.ParkScreenEvent
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.CoreLocation.CLGeocoder
 import platform.CoreLocation.CLHeading
@@ -106,6 +107,7 @@ class CLLocationManagerDelegate(private val onResultListener: (LocationCoordinat
     override fun locationManager(manager: CLLocationManager, didUpdateHeading: CLHeading) =
         notify(manager.location)
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun notify(lastLocation: CLLocation?) {
         when {
             lastLocation != null -> {

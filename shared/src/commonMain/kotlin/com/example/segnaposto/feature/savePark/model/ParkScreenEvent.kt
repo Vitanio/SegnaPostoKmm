@@ -10,6 +10,6 @@ sealed class ParkScreenEvent {
     object InitialState: ParkScreenEvent()
     object RequestPermission: ParkScreenEvent()
     data class ShowPermissionDialog(val isVisible: Boolean, val isRationale: Boolean) : ParkScreenEvent()
-
     data class ShowDialog(val textProvider: BaseTextProvider) : ParkScreenEvent()
+    data class ShowMapDialog(val park: Park) : ParkScreenEvent()
 }
